@@ -12,7 +12,7 @@ object GridController {
     val maxRow = newGrid.length - 1
     val maxCol = newGrid(0).length - 1
 
-    var element = Element("1", "A", false, false)
+    var element = Element(x, y, false, false)
     newGrid(x)(y) = element
 
     if (x == maxRow) {
@@ -29,17 +29,23 @@ object GridController {
   Return : New matrix with all ships placed inside.
    */
   def placeShips (grid: Grid, player: Player, shipSizes: Array[Int], i: Int): Grid = {
-    val newGrid: Grid = grid.copy()
+    var newGrid: Grid = grid.copy()
+    val length: Int = shipSizes.length
     i match {
       /* All ships are placed */
-      case shipSizes.length => newGrid
+      case 5 => newGrid
       case _ =>
         val shipData = player.placeShip(shipSizes(i))
-        val ship = Ship()
-        val isValid: Boolean = checkShipPlacement(newGrid.grid, ship, shipSizes(i))
+        val emptyShip = Ship(Nil, shipData._2, shipSizes(i), false)
+        val ship = ShipController.generateElements(emptyShip, shipData._1, 0)
+        println("Yes ! Data ok")
+        val isValid: Boolean = checkShipPlacement(newGrid.grid, ship)
+        println("Yes ! Placement ok")
+
 
         if (isValid) {
-          newGrid = placeShip(newGrid, ship)
+          newGrid = placeShip(newGrid, ship, 0)
+          println("yes ship placed")
           placeShips(newGrid, player, shipSizes, i + 1)
         } else {
           placeShips(newGrid, player, shipSizes, i)
@@ -48,12 +54,21 @@ object GridController {
     }
   }
 
-  private def placeShip (grid: Array[Array[Element]], ship: Any): Array[Array[Element]] = {
-
+  private def placeShip (grid: Grid, ship: Ship, i: Int): Grid = {
+    println("i : " + i + " - ship.size : " + ship.size)
+    if (i >= ship.size) grid
+    else {
+      var newGrid = grid.copy()
+      val xy = ship.elements(i)
+      println(ship.elements)
+      val newElement = newGrid.grid(xy.row)(xy.col).copy(isShipHere = true)
+      newGrid.grid(xy.row)(xy.col) = newElement
+      placeShip(newGrid, ship, i + 1)
+    }
   }
 
-  private def checkShipPlacement (grid: Array[Array[Element]], ship: Any, size: Int): Boolean = {
-
+  private def checkShipPlacement (grid: Array[Array[Element]], ship: Ship): Boolean = {
+    true
   }
 
 

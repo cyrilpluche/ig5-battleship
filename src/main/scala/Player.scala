@@ -1,18 +1,19 @@
 import scala.util.Random
-import Console.{BLUE, GREEN, RED, YELLOW, RESET, YELLOW_B, UNDERLINED}
+import Console.{BLUE, GREEN, RED, YELLOW, RESET, MAGENTA, UNDERLINED}
 
 case class Player (name: String, c: Int) {
 
-  private val colors: Array[Any] = Array(Console.BLUE, Console.MAGENTA)
+  private val colors: Array[Any] = Array(BLUE, MAGENTA)
   private val alphabet: Array[String] = Array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z")
   private val orientations: Array[String] = Array("right", "left", "top", "bottom")
 
   /* PLAY METHODS */
-  def play (): Any = {
+  def play (): Array[Int] = {
     /* Console display */
-    val a1 = readLine(colors(c) + name + GREEN + " : " + "Choose a row letter > " + RESET)
-    println(a1)
-    val a2 = readLine(colors(c) + name + GREEN + " : " + "Choose a col number > " + RESET)
+    print(colors(c) + name + GREEN + " : " + "Choose a col letter > " + RESET)
+    val a1 = scala.io.StdIn.readLine()
+    print(colors(c) + name + GREEN + " : " + "Choose a row number > " + RESET)
+    val a2 = scala.io.StdIn.readLine()
     println(a2)
 
     /* Parameters checking */
@@ -28,7 +29,7 @@ case class Player (name: String, c: Int) {
 
     if (isValid && checkPlayInputs(a1, a2.toInt)) {
       println("")
-      (alphabet.indexOf(a1), a2.toInt)
+      Array(a2.toInt, alphabet.indexOf(a1))
     }
     else {
       println("\n" + RED + "Please, submit a valid location.\n")
@@ -49,13 +50,14 @@ case class Player (name: String, c: Int) {
   }
 
   /* PLACE SHIP METHODS */
-  def placeShip (size: Int): Any = {
+  def placeShip (size: Int): (Array[Int], String) = {
     println(YELLOW + "Submit a location for the first slot of the ship." + RESET)
     val origin = play()
 
     /* Console display */
     println(YELLOW + "Submit an orientation for the ship (right, left, top, bottom)." + RESET)
-    val a1 = readLine(colors(c) + name + GREEN + " : " + "Choose an orientation > " + RESET)
+    print(colors(c) + name + GREEN + " : " + "Choose an orientation > " + RESET)
+    val a1 = scala.io.StdIn.readLine()
     println(a1)
 
     if (checkPlaceShipInputs(a1)) {

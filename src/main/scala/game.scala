@@ -22,11 +22,11 @@ object game extends App {
     val p1 = Player("Cyril", 0)
     val p2 = Player("Enzo", 1)
 
-    val ship1 = p1.placeShip(5)
-    val ship2 = p2.placeShip(5)
+    val g11 = GridController.placeShips(grid, p1, shipSizes, 0)
+    //val g22 = GridController.placeShips(grid, p2, shipSizes, 0)
 
-    println(ship1)
-    println(ship2)
+    println(g11.grid)
+    //println(g22)
 
     true
   }
