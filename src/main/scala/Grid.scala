@@ -1,6 +1,4 @@
-case class Element (rowLabel: String, colLabel: String, isShipHere: Boolean, isShooted: Boolean)
-
-case class Ship (elements: List[Element], orientation: String, size: Int, isDead: Boolean)
+case class Element (row: Int, col: Int, isShipHere: Boolean, isShooted: Boolean)
 
 case class Grid (rows: Int, cols: Int, grid: Array[Array[Element]])
 
