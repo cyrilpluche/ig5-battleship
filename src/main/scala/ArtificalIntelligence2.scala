@@ -7,7 +7,6 @@ class ArtificialIntelligence2 (override val random: Random, override val name: S
   override def play (): Array[Int] = {
     val x = random.nextInt(cols)
     val y = random.nextInt(rows)
-    println("Ok AI proposed : " + y + " and " + x)
     Array(y, x)
   }
 }

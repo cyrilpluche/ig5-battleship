@@ -9,8 +9,6 @@ case class ArtificialIntelligence1 (random: Random, name: String, color: Int, is
   def play (): Array[Int] = {
     val x = random.nextInt(cols)
     val y = random.nextInt(rows)
-    println("Ok AI proposed : " + y + " and " + x)
-
     Array(y, x)
   }
 

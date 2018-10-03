@@ -33,7 +33,7 @@ object GridController {
   Return : New matrix with all ships placed inside.
    */
   def placeShips (grid: Grid, player: Player, opponent: Player, shipSizes: Array[Int], i: Int): Grid = {
-    displayGrid(grid, player, opponent, true, -1, -1)
+    // displayGrid(grid, player, opponent, true, -1, -1)
 
     var newGrid: Grid = grid.copy()
     if (i >= shipSizes.length) {
@@ -86,11 +86,10 @@ object GridController {
 
       /* We check if all ship parts are inside the grid */
       if (x < 0 || x >= grid(0).length || y < 0 || y >= grid.length) {
-        println("\n" + RED + "Sorry, this ship is outside of the grid. Try again.\n")
+        println("\n" + RED + "Sorry, this ship is outside of the grid. Try again.\n" + RESET)
         false
 
       } else {
-        println("Ok you proposed : " + y + " and " + x)
         if (grid(y)(x).isShipHere) {
           println("\n" + RED + "Sorry, there is already a ship on these locations. Try again.\n")
           false
@@ -165,7 +164,7 @@ object GridController {
   Return : Updated grid with the shoot of the user.
    */
   def shootOnGrid (grid: Grid, player: Player, opponent: Player): Grid = {
-    displayGrid(grid, player, opponent, false, -1, -1)
+    // displayGrid(grid, player, opponent, false, -1, -1)
     println(player.getColor() + player.getName() + YELLOW + ", where do you want to shoot ?" + RESET)
     val xy: Array[Int] = player.play()
 
@@ -184,7 +183,7 @@ object GridController {
       var newG: Array[Array[Element]] = grid.grid.clone()
       newG(y)(x) = newElement
       val newGrid: Grid = grid.copy(grid = newG, ships = newShips)
-      displayGrid(newGrid, player, opponent, false, -1, -1)
+      // displayGrid(newGrid, player, opponent, false, -1, -1)
       newGrid
       // end
     } else {
