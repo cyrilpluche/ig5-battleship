@@ -1,7 +1,7 @@
 import scala.util.Random
 
-class ArtificialIntelligence2(random: Random, name: String, color: Int) extends ArtificialIntelligence1(random, name, color) {
-  /*val lastSlotHitted: Array[Int] = Array(-1, -1)
+/*class ArtificialIntelligence2(random: Random, name: String, color: Int) extends ArtificialIntelligence1(random, name, color) {
+  val lastSlotHitted: Array[Int] = Array(-1, -1)
   val nbSlotHitted: Int = 0
   val shipOrientation: String = "right"
 
@@ -49,5 +49,5 @@ class ArtificialIntelligence2(random: Random, name: String, color: Int) extends 
       }
     }
     Array(x, y)
-  }*/
-}
+  }
+}*/

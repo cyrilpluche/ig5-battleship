@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ScalaCompilerConfiguration">
-    <profile name="sbt 1" modules="battleship,ig5-battleship" />
+    <profile name="sbt 1" modules="ig5-battleship,battleship" />
   </component>
 </project>

@@ -1,6 +1,9 @@
+import scala.Console.{YELLOW_B, GREEN_B, RED, GREEN, YELLOW, RESET}
+
 case class Ship (elements: List[Element], orientation: String, size: Int, isDead: Boolean)
 
 object ShipController {
+
   def generateElements (ship: Ship, slot: Array[Int], i: Int): Ship = {
     if (i > ship.size - 1) ship
     else {
@@ -16,8 +19,28 @@ object ShipController {
         case "top" => newSlot(0) -= 1
         case "bottom" => newSlot(0) += 1
       }
-      println(newSlot)
       generateElements(newShip, newSlot, i + 1)
     }
+  }
+
+  def isTouched (player: Player, ship: Ship, updatedElement: List[Element], x: Int, y: Int, i: Int): Ship = {
+    if (i == ship.elements.length) {
+      if (updatedElement.isEmpty) {
+        killShipMessage(player, ship.size)
+        ship.copy(elements = Nil, isDead = true)
+      }
+      else ship.copy(elements = updatedElement)
+    }
+    else {
+      if (ship.elements(i).row == y && ship.elements(i).col == x) {
+        isTouched(player, ship, updatedElement, x, y, i + 1)
+      }
+      else isTouched(player, ship, ship.elements(i) :: updatedElement, x, y, i + 1)
+    }
+  }
+
+  def killShipMessage (player: Player, s: Int): Unit = {
+    println(player.getColor() + player.getName() + GREEN + " has destroy a ship of size " + s + ", " + RED + "insane.\n" + RESET)
+
   }
 }

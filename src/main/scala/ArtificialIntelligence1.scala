@@ -1,6 +1,6 @@
 import scala.util.Random
 
-class ArtificialIntelligence1(random: Random, name: String, color: Int) extends Player(name, color) {
+/*class ArtificialIntelligence1(random: Random, name: String, color: Int) extends Player(name, color) {
 
   def play (grid: Array[Array[Boolean]]): Array[Array[Boolean]] = {
     var slot: Array[Int] = this.chooseASlot(grid, random, Array(-1, -1), Array(-1, -1))
@@ -48,4 +48,4 @@ class ArtificialIntelligence1(random: Random, name: String, color: Int) extends 
     /* We test next slot */
     chooseASlot(grid, r, slot, fs)
   }
-}
+}*/

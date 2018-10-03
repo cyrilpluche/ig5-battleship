@@ -1,4 +1,5 @@
 import scala.util.Random
+import Console.{BLUE, GREEN, RED, YELLOW, RESET, MAGENTA, UNDERLINED}
 
 // case class Ship (size: Int, start: Array[String], direction: String, hit: Int)
 
@@ -6,30 +7,124 @@ object game extends App {
 
   val cols: Int = 10
   val rows: Int = 10
-  val shipSizes: Array[Int] = Array(5, 4, 3, 3, 2)
+  val shipSizes: Array[Int] = Array(1)
 
-  val g: Grid = Grid(rows, cols, Array.ofDim[Element](rows, cols))
+  val grid1: Grid = Grid(rows, cols, Array.ofDim[Element](rows, cols), Nil)
+  val grid2: Grid = Grid(rows, cols, Array.ofDim[Element](rows, cols), Nil)
 
-  val game = mainLoop(g)
 
-  def mainLoop(grid: Grid): Boolean = {
-    println("GAME START")
+  val game = mainLoop(0, null, null, grid1, grid2)
 
-    /* We initialize grids */
-    val g1 = Grid(grid.rows, grid.cols, GridController.initialize(grid.grid, 0, 0))
-    val g2 = g1.copy()
+  /*
+  This loop is a recursive match case pattern. Each case correspond to an action of the game.
+   */
+  def mainLoop (i: Int, p1: Player, p2: Player, g1: Grid, g2: Grid): Boolean = {
+    i match {
+      case 0 =>
+        /* Start display and player 1 informations */
+        println(RED + "========== GAME START ==========\n" + RESET)
+        val newP1: Player = selectGameMode(1)
+        mainLoop(1, newP1, p2, g1, g2)
 
-    val p1 = Player("Cyril", 0)
-    val p2 = Player("Enzo", 1)
+      case 1 =>
+        /* Player 2 informations */
+        val newP2: Player = selectGameMode(2)
+        mainLoop(2, p1, newP2, g1, g2)
 
-    val g11 = GridController.placeShips(grid, p1, shipSizes, 0)
-    //val g22 = GridController.placeShips(grid, p2, shipSizes, 0)
+      case 2 =>
+        /* grids initialisation */
+        val newG1 = Grid(g1.rows, g1.cols, GridController.initialize(g1.grid, 0, 0), Nil)
+        val newG2 = Grid(g2.rows, g2.cols, GridController.initialize(g2.grid, 0, 0), Nil)
+        mainLoop(3, p1, p2, newG1, newG2)
 
-    println(g11.grid)
-    //println(g22)
+      case 3 =>
+        /* Player 1 ships placement */
+        val newG1 = GridController.placeShips(g1, p1, p2, shipSizes, 0)
+        mainLoop(4, p1, p2, newG1, g2)
 
+      case 4 =>
+        /* Player 2 ships placement */
+        val newG2 = GridController.placeShips(g2, p2, p1, shipSizes, 0)
+        mainLoop(5, p1, p2, g1, newG2)
+
+      case 5 =>
+        /* Begin game console display */
+        println(RED + "Players are ready. Let's begin\n" + RESET)
+        mainLoop(6, p1, p2, g1, g2)
+
+      case 6 =>
+        /* Player 1 shoot */
+        val nG2: Grid = GridController.shootOnGrid(g2, p1, p2)
+        val newG2: Grid = GridController.removeEmptyShips(nG2, Nil, 0)
+        mainLoop(9, p1, p2, g1, newG2)
+
+      case 7 =>
+        /* Player 2 shoot */
+        val nG1: Grid = GridController.shootOnGrid(g1, p2, p1)
+        val newG1: Grid = GridController.removeEmptyShips(nG1, Nil, 0)
+        mainLoop(8, p1, p2, newG1, g2)
+
+      case 8 =>
+        /* We check ships of player 1 */
+        if (g1.ships.isEmpty) {
+          println(p2.getColor() + p2.getName() + GREEN + " has destroy all ships. He's the winner, " + RED + "congratulations.\n" + RESET)
+          println(RED + "GAME END\n" + RESET)
+        } else {
+          println(RED + "========== PLAYER 1 TURN ==========\n" + RESET)
+          mainLoop(6, p1, p2, g1, g2)
+        }
+
+      case 9 =>
+        /* We check ships of player 2 */
+        if (g2.ships.isEmpty) {
+          println(p1.getColor() + p1.getName() + GREEN + " has destroy all ships. He's the winner, " + RED + "congratulations.\n" + RESET)
+          println(RED + "========== GAME END ==========\n" + RESET)
+        } else {
+          println(RED + "========== PLAYER 2 TURN ==========\n" + RESET)
+          mainLoop(7, p1, p2, g1, g2)
+        }
+
+      case 10 =>
+        println(YELLOW + "Do you want to restart this game ? (y/n) > " + RESET)
+        val a: Char = scala.io.StdIn.readChar()
+        val aFormat: Char = a.toUpper
+        if (aFormat == 'Y') {
+          println(YELLOW + "\nGame is restarting." + RESET)
+          mainLoop(2, p2, p1, grid1, grid2)
+        } else {
+          println(YELLOW + "\nBattleship is finished. You will find game results in a CSV file." + RESET)
+        }
+
+    }
     true
   }
+
+  def selectGameMode (num: Int): Player = {
+    println(YELLOW + "Select player type n°" + num + "." + RESET)
+    println("1 - " + YELLOW + "Human." + RESET)
+    println("2 - " + YELLOW + "IA." + RESET)
+    print(BLUE + "Planner" + GREEN + " : Submit player type > " + RESET)
+    val playerType = scala.io.StdIn.readInt()
+    println(playerType)
+    print(BLUE + "Planner" + GREEN + " : Submit player name > " + RESET)
+    val name = scala.io.StdIn.readLine()
+    println(name)
+
+    playerType match {
+      case 1 =>
+        println("")
+        Human(name, num - 1)
+      case 2 =>
+        println("")
+        Human(name, num - 1)
+      case _ =>
+        println("\n" + RED + "Please, submit a valid type (1 or 2).\n")
+        selectGameMode(num)
+    }
+
+  }
+
+
 
   /*val ia1: Player = new ArtificialIntelligence1(new Random, "IA1")
   val ia2: Player = new ArtificialIntelligence2(new Random, "IA2")
