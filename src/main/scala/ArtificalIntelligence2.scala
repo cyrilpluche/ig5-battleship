@@ -1,4 +1,16 @@
 import scala.util.Random
+import game.cols
+import game.rows
+
+class ArtificialIntelligence2 (override val random: Random, override val name: String, override val color: Int, override val isIA: Boolean) extends ArtificialIntelligence1(random, name, color, isIA) {
+
+  override def play (): Array[Int] = {
+    val x = random.nextInt(cols)
+    val y = random.nextInt(rows)
+    println("Ok AI proposed : " + y + " and " + x)
+    Array(y, x)
+  }
+}
 
 /*class ArtificialIntelligence2(random: Random, name: String, color: Int) extends ArtificialIntelligence1(random, name, color) {
   val lastSlotHitted: Array[Int] = Array(-1, -1)

@@ -1,5 +1,5 @@
 import scala.util.Random
-import Console.{BLUE, GREEN, RED, YELLOW, RESET, MAGENTA, UNDERLINED}
+import Console.{BLUE, GREEN, MAGENTA, RED, RESET, UNDERLINED, YELLOW}
 
 // case class Ship (size: Int, start: Array[String], direction: String, hit: Int)
 
@@ -7,7 +7,10 @@ object game extends App {
 
   val cols: Int = 10
   val rows: Int = 10
-  val shipSizes: Array[Int] = Array(1)
+  val shipSizes: Array[Int] = Array(2, 3, 3, 4, 5)
+  val random1: Random = new Random
+  val random2: Random = new Random
+  val random3: Random = new Random
 
   val grid1: Grid = Grid(rows, cols, Array.ofDim[Element](rows, cols), Nil)
   val grid2: Grid = Grid(rows, cols, Array.ofDim[Element](rows, cols), Nil)
@@ -22,7 +25,9 @@ object game extends App {
     i match {
       case 0 =>
         /* Start display and player 1 informations */
-        println(RED + "========== GAME START ==========\n" + RESET)
+        println(RED + "========== GAME START ==========" + RESET)
+        println(YELLOW + "NB : All answer except player names are TO UPPURCASE.\nOtherwise you will have to give informations again.\n" + RESET)
+
         val newP1: Player = selectGameMode(1)
         mainLoop(1, newP1, p2, g1, g2)
 
@@ -55,13 +60,13 @@ object game extends App {
       case 6 =>
         /* Player 1 shoot */
         val nG2: Grid = GridController.shootOnGrid(g2, p1, p2)
-        val newG2: Grid = GridController.removeEmptyShips(nG2, Nil, 0)
+        val newG2: Grid = GridController.removeEmptyShips(nG2, p1, Nil, 0)
         mainLoop(9, p1, p2, g1, newG2)
 
       case 7 =>
         /* Player 2 shoot */
         val nG1: Grid = GridController.shootOnGrid(g1, p2, p1)
-        val newG1: Grid = GridController.removeEmptyShips(nG1, Nil, 0)
+        val newG1: Grid = GridController.removeEmptyShips(nG1, p2, Nil, 0)
         mainLoop(8, p1, p2, newG1, g2)
 
       case 8 =>
@@ -69,6 +74,7 @@ object game extends App {
         if (g1.ships.isEmpty) {
           println(p2.getColor() + p2.getName() + GREEN + " has destroy all ships. He's the winner, " + RED + "congratulations.\n" + RESET)
           println(RED + "GAME END\n" + RESET)
+          mainLoop(10, p1, p2, g1, g2)
         } else {
           println(RED + "========== PLAYER 1 TURN ==========\n" + RESET)
           mainLoop(6, p1, p2, g1, g2)
@@ -79,20 +85,23 @@ object game extends App {
         if (g2.ships.isEmpty) {
           println(p1.getColor() + p1.getName() + GREEN + " has destroy all ships. He's the winner, " + RED + "congratulations.\n" + RESET)
           println(RED + "========== GAME END ==========\n" + RESET)
+          mainLoop(10, p1, p2, g1, g2)
         } else {
           println(RED + "========== PLAYER 2 TURN ==========\n" + RESET)
           mainLoop(7, p1, p2, g1, g2)
         }
 
       case 10 =>
-        println(YELLOW + "Do you want to restart this game ? (y/n) > " + RESET)
-        val a: Char = scala.io.StdIn.readChar()
-        val aFormat: Char = a.toUpper
-        if (aFormat == 'Y') {
+        println(YELLOW + "Do you want to restart this game ? (Y/N) > " + RESET)
+        val a: String = scala.io.StdIn.readLine()
+        if (a == "Y") {
           println(YELLOW + "\nGame is restarting." + RESET)
           mainLoop(2, p2, p1, grid1, grid2)
-        } else {
+        } else if (a == "N") {
           println(YELLOW + "\nBattleship is finished. You will find game results in a CSV file." + RESET)
+        } else {
+          println("\n" + RED + "Please, submit a valid answer (Y or N).\n")
+          mainLoop(10, p1, p2, g1, g2)
         }
 
     }
@@ -101,24 +110,29 @@ object game extends App {
 
   def selectGameMode (num: Int): Player = {
     println(YELLOW + "Select player type n°" + num + "." + RESET)
-    println("1 - " + YELLOW + "Human." + RESET)
+    println("0 - " + YELLOW + "Human." + RESET)
+    println("1 - " + YELLOW + "IA." + RESET)
     println("2 - " + YELLOW + "IA." + RESET)
+    println("3 - " + YELLOW + "IA." + RESET)
+
     print(BLUE + "Planner" + GREEN + " : Submit player type > " + RESET)
-    val playerType = scala.io.StdIn.readInt()
+    val playerType = scala.io.StdIn.readLine()
     println(playerType)
     print(BLUE + "Planner" + GREEN + " : Submit player name > " + RESET)
     val name = scala.io.StdIn.readLine()
-    println(name)
+    println(name + "\n")
 
     playerType match {
-      case 1 =>
-        println("")
-        Human(name, num - 1)
-      case 2 =>
-        println("")
-        Human(name, num - 1)
+      case "0" =>
+        Human(name, num - 1, false)
+      case "1" =>
+        ArtificialIntelligence1(random1, name, num - 1, true)
+      case "2" =>
+        new ArtificialIntelligence2(random2, name, num - 1, true)
+      case "3" =>
+        ArtificialIntelligence1(random3, name, num - 1, true)
       case _ =>
-        println("\n" + RED + "Please, submit a valid type (1 or 2).\n")
+        println(RED + "Please, submit a valid type (1 or 2).\n")
         selectGameMode(num)
     }
 

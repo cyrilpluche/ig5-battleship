@@ -24,9 +24,8 @@ object ShipController {
   }
 
   def isTouched (player: Player, ship: Ship, updatedElement: List[Element], x: Int, y: Int, i: Int): Ship = {
-    if (i == ship.elements.length) {
+    if (i >= ship.elements.length) {
       if (updatedElement.isEmpty) {
-        killShipMessage(player, ship.size)
         ship.copy(elements = Nil, isDead = true)
       }
       else ship.copy(elements = updatedElement)
@@ -40,7 +39,6 @@ object ShipController {
   }
 
   def killShipMessage (player: Player, s: Int): Unit = {
-    println(player.getColor() + player.getName() + GREEN + " has destroy a ship of size " + s + ", " + RED + "insane.\n" + RESET)
-
+    println(player.getColor() + player.getName() + GREEN + " has destroy a ship of size " + s + ". The other player said " + RED + "\'You sank my battleship!\'.\n" + RESET)
   }
 }

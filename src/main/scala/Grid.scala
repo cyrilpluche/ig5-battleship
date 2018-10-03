@@ -61,10 +61,13 @@ object GridController {
   Fix a valid ship that has been checked by "CheckShipPlacement" before.
    */
   private def placeShip (grid: Grid, ship: Ship, i: Int): Grid = {
-    if (i >= ship.size) grid
-    else {
+    if (i >= ship.size) {
       val newShips: List[Ship] = ship :: grid.ships
-      var newGrid = grid.copy(ships = newShips)
+      val newGrid = grid.copy(ships = newShips)
+      newGrid
+    }
+    else {
+      var newGrid = grid.copy()
       val xy = ship.elements(i)
       val newElement = newGrid.grid(xy.row)(xy.col).copy(isShipHere = true)
       newGrid.grid(xy.row)(xy.col) = newElement
@@ -80,12 +83,14 @@ object GridController {
     else {
       val x = ship.elements(i).col
       val y = ship.elements(i).row
+
       /* We check if all ship parts are inside the grid */
-      if (x < 0 || x >= grid(0).length || y < 0 || y > grid.length) {
+      if (x < 0 || x >= grid(0).length || y < 0 || y >= grid.length) {
         println("\n" + RED + "Sorry, this ship is outside of the grid. Try again.\n")
         false
-      }
-      else {
+
+      } else {
+        println("Ok you proposed : " + y + " and " + x)
         if (grid(y)(x).isShipHere) {
           println("\n" + RED + "Sorry, there is already a ship on these locations. Try again.\n")
           false
@@ -191,9 +196,9 @@ object GridController {
   Return : Ship list updated according to the xy shoot. 1 ship will be updated.
    */
   def shootShip (player: Player, ships: List[Ship], updatedShips: List[Ship], x: Int, y: Int, i: Int): List[Ship] = {
-    if (i == ships.size) updatedShips
+    if (i >= ships.size) updatedShips
     else {
-      /* We each ship and add them to the new ship list */
+      /* We check each ship and add them to the new ship list */
       val newShip: Ship = ShipController.isTouched(player, ships(i), Nil,  x , y, 0)
       shootShip(player, ships, newShip :: updatedShips, x, y, i + 1)
     }
@@ -219,14 +224,17 @@ object GridController {
   /*
   We remove every ships that are dead.
    */
-  def removeEmptyShips (grid: Grid, updatedShips: List[Ship], i: Int): Grid = {
+  def removeEmptyShips (grid: Grid, player: Player, updatedShips: List[Ship], i: Int): Grid = {
     if (grid.ships.size == i) {
       val newGrid: Grid = grid.copy(ships = updatedShips)
       newGrid
     } else {
       /* If the ship has no elements, we remove it from the ships list of the grid */
-      if (grid.ships(i).isDead) removeEmptyShips(grid, updatedShips, i + 1)
-      else removeEmptyShips(grid, grid.ships(i) :: updatedShips, i + 1)
+      if (grid.ships(i).isDead) {
+        ShipController.killShipMessage(player, grid.ships(i).size)
+        removeEmptyShips(grid, player, updatedShips, i + 1)
+      }
+      else removeEmptyShips(grid, player, grid.ships(i) :: updatedShips, i + 1)
     }
   }
 }

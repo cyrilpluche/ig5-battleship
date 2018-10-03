@@ -1,7 +1,7 @@
 import scala.util.Random
 import Console.{BLUE, GREEN, RED, YELLOW, RESET, MAGENTA, UNDERLINED}
 
-abstract class Player (name: String, c: Int) {
+abstract class Player (name: String, c: Int, isIA: Boolean) {
 
   protected val colors: Array[Any] = Array(BLUE, MAGENTA)
   protected val alphabet: Array[String] = Array("A", "B", "C", "D", "E", "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z")
@@ -40,6 +40,9 @@ abstract class Player (name: String, c: Int) {
   def getName (): String = {
     name
   }
-  // def chooseASlot (grid: Array[Array[Boolean]], r: Random, slot: Array[Int], firstSlot: Array[Int]) : Array[Int]
+
+  def getIsIA (): Boolean = {
+    isIA
+  }
 
 }

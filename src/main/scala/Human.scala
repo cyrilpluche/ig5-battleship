@@ -1,6 +1,6 @@
 import Console.{BLUE, GREEN, RED, YELLOW, RESET, MAGENTA, UNDERLINED}
 
-case class Human (name: String, c: Int) extends Player (name, c) {
+case class Human (name: String, c: Int, isIA: Boolean) extends Player (name, c, isIA) {
 
   /* PLAY METHODS */
   def play (): Array[Int] = {
