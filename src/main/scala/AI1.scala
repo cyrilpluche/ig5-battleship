@@ -1,8 +1,8 @@
 import scala.util.Random
-import game.cols
-import game.rows
+import Game.cols
+import Game.rows
 
-case class ArtificialIntelligence1 (random: Random, name: String, color: Int, isIA: Boolean) extends Player(name, color, isIA) {
+case class AI1(random: Random, name: String, color: Int, isIA: Boolean, lvlAI: Int) extends Player(name, color, isIA, lvlAI) {
 
   val orientationLabels: Array[String] = Array("right", "left", "top", "bottom")
 

@@ -1,4 +1,4 @@
-import scala.Console.{YELLOW_B, GREEN_B, RED, GREEN, YELLOW, RESET}
+import Helper.{displayToUser}
 
 case class Ship (elements: List[Element], orientation: String, size: Int, isDead: Boolean)
 
@@ -38,7 +38,7 @@ object ShipController {
     }
   }
 
-  def killShipMessage (player: Player, s: Int): Unit = {
-    println(player.getColor() + player.getName() + GREEN + " has destroy a ship of size " + s + ". The other player said " + RED + "\'You sank my battleship!\'.\n" + RESET)
+  def killShipMessage (player: Player, opponent: Player, s: Int): Unit = {
+    displayToUser(Some(player), Some(opponent), "has destroy a ship of size" + s + ". The other player said " + Console.RED + "\'You sank my battleship!\'.", 3, true)
   }
 }

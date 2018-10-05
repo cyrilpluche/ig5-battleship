@@ -1,4 +1,5 @@
 import scala.Console.{RED_B, GREEN_B, RED, GREEN, YELLOW, RESET}
+import Helper.{displayToUser}
 
 case class Element (row: Int, col: Int, isShipHere: Boolean, isShooted: Boolean)
 
@@ -33,7 +34,7 @@ object GridController {
   Return : New matrix with all ships placed inside.
    */
   def placeShips (grid: Grid, player: Player, opponent: Player, shipSizes: Array[Int], i: Int): Grid = {
-    // displayGrid(grid, player, opponent, true, -1, -1)
+    if (!player.getIsAI())displayGrid(grid, player, opponent, true, -1, -1)
 
     var newGrid: Grid = grid.copy()
     if (i >= shipSizes.length) {
@@ -46,7 +47,7 @@ object GridController {
       val emptyShip = Ship(Nil, shipData._2, shipSizes(i), false)
       val ship = ShipController.generateElements(emptyShip, shipData._1, 0)
 
-      val isValid: Boolean = checkShipPlacement(newGrid.grid, ship, 0)
+      val isValid: Boolean = checkShipPlacement(newGrid.grid, player, ship, 0)
 
       if (isValid) {
         newGrid = placeShip(newGrid, ship, 0)
@@ -78,23 +79,22 @@ object GridController {
   /*
   Check if the generated elements fits with the grid and if there is no ship on the newShip placement.
    */
-  private def checkShipPlacement (grid: Array[Array[Element]], ship: Ship, i: Int): Boolean = {
+  private def checkShipPlacement (grid: Array[Array[Element]], player: Player, ship: Ship, i: Int): Boolean = {
     if (i == ship.elements.size) true
     else {
       val x = ship.elements(i).col
       val y = ship.elements(i).row
-
       /* We check if all ship parts are inside the grid */
       if (x < 0 || x >= grid(0).length || y < 0 || y >= grid.length) {
-        println("\n" + RED + "Sorry, this ship is outside of the grid. Try again.\n" + RESET)
+        displayToUser(Some(player), None, "Sorry, this ship is outside of the grid. Try again.", 4, true)
         false
 
       } else {
         if (grid(y)(x).isShipHere) {
-          println("\n" + RED + "Sorry, there is already a ship on these locations. Try again.\n")
+          displayToUser(Some(player), None, "Sorry, there is already a ship on these locations. Try again.", 4, true)
           false
         }
-        else checkShipPlacement(grid, ship, i + 1)
+        else checkShipPlacement(grid, player, ship, i + 1)
       }
     }
   }
@@ -111,9 +111,9 @@ object GridController {
         case -1 =>
           if (x == -1) {
             if (showShip) {
-              println(player.getColor() + player.getName() + YELLOW + "'s ship grid" + RESET)
+              displayToUser(Some(player), Some(opponent), "ship grid", 2, false)
             } else {
-              println(player.getColor() + player.getName() + YELLOW + ", please shoot on a new slot of " + opponent.getColor() + opponent.getName() + YELLOW +  "'s grid." + RESET)
+              displayToUser(Some(player), Some(opponent), "please shoot on a new slot of " + opponent.getColor() + opponent.getName() + YELLOW +  "'s grid.", 2, false)
             }
             print(YELLOW + "\\ " + RESET)
             newX += 1
@@ -164,29 +164,37 @@ object GridController {
   Return : Updated grid with the shoot of the user.
    */
   def shootOnGrid (grid: Grid, player: Player, opponent: Player): Grid = {
-    // displayGrid(grid, player, opponent, false, -1, -1)
-    println(player.getColor() + player.getName() + YELLOW + ", where do you want to shoot ?" + RESET)
+    if (!player.getIsAI()) displayGrid(grid, player, opponent, false, -1, -1)
+    displayToUser(Some(player), None, "where do you want to shoot ?", 2, false)
     val xy: Array[Int] = player.play()
 
-    if (checkShoot(grid, xy)) {
+    /* Check if the shot is on the grid. */
+    if (checkShoot(grid, xy, player)) {
       val x = xy(1)
       val y = xy(0)
 
-      if (grid.grid(y)(x).isShipHere) {
-        println(player.getColor() + player.getName() + GREEN + " has shot on target, nice." + RESET)
-      } else {
-        println(player.getColor() + player.getName() + YELLOW + " has shot in the water, looser.\n" + RESET)
-      }
       /* We update the grid */
       val newElement: Element = grid.grid(y)(x).copy(isShooted = true)
       val newShips: List[Ship] = shootShip(player, grid.ships, Nil, x, y, 0)
       var newG: Array[Array[Element]] = grid.grid.clone()
       newG(y)(x) = newElement
       val newGrid: Grid = grid.copy(grid = newG, ships = newShips)
-      // displayGrid(newGrid, player, opponent, false, -1, -1)
+      if (!player.getIsAI() || !opponent.getIsAI()) displayGrid(newGrid, player, opponent, false, -1, -1)
+
+      /* We display the result */
+      if (grid.grid(y)(x).isShipHere) {
+        displayToUser(Some(player), Some(opponent), "has shot on target, nice.", 3, true)
+        player.isShipTouched = 1
+        player.targetLocked = true
+      } else {
+        displayToUser(Some(player), Some(opponent), "has shot in the water, looser.", 3, true)
+        player.isShipTouched = 2
+      }
+
       newGrid
       // end
     } else {
+      player.isShipTouched = 2
       shootOnGrid(grid, player, opponent)
     }
   }
@@ -206,14 +214,14 @@ object GridController {
   /*
   Return : True if the shoot is on the grid. False if not.
    */
-  private def checkShoot (grid: Grid, shoot: Array[Int]): Boolean = {
+  private def checkShoot (grid: Grid, shoot: Array[Int], player: Player): Boolean = {
     val x = shoot(1)
     val y = shoot(0)
-    if (x < 0 || x >= grid.grid(0).length || y < 0 || y > grid.grid.length) {
-      println(RED + "ERROR : This shoot is outside of the grid. Try again." + RESET)
+    if (x < 0 || x >= grid.grid(0).length || y < 0 || y >= grid.grid.length) {
+      displayToUser(Some(player), None, "ERROR : This shoot is outside of the grid. Try again.", 4, true)
       false
-    } else if (grid.grid(y)(x).isShooted) {
-      println(RED + "ERROR : You have already shoot here. Try again." + RESET)
+    } else if (grid.grid(y)(x).isShooted && player.getLvlAI > 1) {
+      // displayToUser(Some(player), None, "ERROR : You have already shoot here. Try again.", 4, true)
       false
     } else {
       true
@@ -223,17 +231,19 @@ object GridController {
   /*
   We remove every ships that are dead.
    */
-  def removeEmptyShips (grid: Grid, player: Player, updatedShips: List[Ship], i: Int): Grid = {
+  def removeEmptyShips (grid: Grid, player: Player, opponent: Player, updatedShips: List[Ship], i: Int): Grid = {
     if (grid.ships.size == i) {
       val newGrid: Grid = grid.copy(ships = updatedShips)
       newGrid
     } else {
       /* If the ship has no elements, we remove it from the ships list of the grid */
       if (grid.ships(i).isDead) {
-        ShipController.killShipMessage(player, grid.ships(i).size)
-        removeEmptyShips(grid, player, updatedShips, i + 1)
+        player.isShipTouched = 0
+        player.targetLocked = false
+        ShipController.killShipMessage(player, opponent, grid.ships(i).size)
+        removeEmptyShips(grid, player, opponent, updatedShips, i + 1)
       }
-      else removeEmptyShips(grid, player, grid.ships(i) :: updatedShips, i + 1)
+      else removeEmptyShips(grid, player, opponent, grid.ships(i) :: updatedShips, i + 1)
     }
   }
 }
