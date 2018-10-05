@@ -1,5 +1,6 @@
 import scala.util.Random
 import Console.{BLUE, GREEN, MAGENTA, RED, RESET, UNDERLINED, YELLOW}
+import scala.annotation.tailrec
 
 // case class Ship (size: Int, start: Array[String], direction: String, hit: Int)
 
@@ -9,7 +10,7 @@ object Game extends App {
 
   val cols: Int = 10
   val rows: Int = 10
-  val shipSizes: Array[Int] = Array(2, 3, 3, 4, 5)
+  val shipSizes: Array[Int] = Array(1)
   val random1: Random = new Random
   val random2: Random = new Random
   val random3: Random = new Random
@@ -24,6 +25,7 @@ object Game extends App {
   /*
   This loop is a recursive match case pattern. Each case correspond to an action of the game.
    */
+  @tailrec
   def mainLoop (i: Int, p1: Player, p2: Player, g1: Grid, g2: Grid, loop: Int, history: History): Boolean = {
     i match {
       case 0 =>

@@ -1,5 +1,7 @@
-import scala.Console.{RED_B, GREEN_B, RED, GREEN, YELLOW, RESET}
-import Helper.{displayToUser}
+import scala.Console.{GREEN, GREEN_B, RED, RED_B, RESET, YELLOW}
+import Helper.displayToUser
+
+import scala.annotation.tailrec
 
 case class Element (row: Int, col: Int, isShipHere: Boolean, isShooted: Boolean)
 
@@ -12,6 +14,7 @@ object GridController {
   /*
   Return : Matrix with default element in each slot.
    */
+  @tailrec
   def initialize (oldGrid: Array[Array[Element]], x: Int, y: Int): Array[Array[Element]] = {
     var newGrid = oldGrid.clone
     val maxRow = newGrid.length - 1
@@ -33,6 +36,7 @@ object GridController {
   /*
   Return : New matrix with all ships placed inside.
    */
+  @tailrec
   def placeShips (grid: Grid, player: Player, opponent: Player, shipSizes: Array[Int], i: Int): Grid = {
     if (!player.getIsAI())displayGrid(grid, player, opponent, true, -1, -1)
 
@@ -79,6 +83,7 @@ object GridController {
   /*
   Check if the generated elements fits with the grid and if there is no ship on the newShip placement.
    */
+  @tailrec
   private def checkShipPlacement (grid: Array[Array[Element]], player: Player, ship: Ship, i: Int): Boolean = {
     if (i == ship.elements.size) true
     else {
@@ -102,6 +107,7 @@ object GridController {
   /*
   Display the grid with labels. If showShip : It's the current user grid. Else it's the opponent grid.
    */
+  @tailrec
   def displayGrid (grid: Grid, player: Player, opponent: Player, showShip: Boolean, x: Int, y: Int): Unit = {
     var newX: Int = x
     var newY: Int = y
@@ -179,7 +185,8 @@ object GridController {
       var newG: Array[Array[Element]] = grid.grid.clone()
       newG(y)(x) = newElement
       val newGrid: Grid = grid.copy(grid = newG, ships = newShips)
-      if (!player.getIsAI() || !opponent.getIsAI()) displayGrid(newGrid, player, opponent, false, -1, -1)
+      if (!player.getIsAI() || !opponent.getIsAI()) displayGrid(newGrid, player, opponent, true, -1, -1)
+      else if (!player.getIsAI() && !opponent.getIsAI()) displayGrid(newGrid, player, opponent, false, -1, -1)
 
       /* We display the result */
       if (grid.grid(y)(x).isShipHere) {
