@@ -38,7 +38,7 @@ object GridController {
    */
   @tailrec
   def placeShips (grid: Grid, player: Player, opponent: Player, shipSizes: Array[Int], i: Int): Grid = {
-    if (!player.getIsAI())displayGrid(grid, player, opponent, true, -1, -1)
+    if (!player.getIsAI())displayGrid(grid, player, opponent, 0, -1, -1)
 
     var newGrid: Grid = grid.copy()
     if (i >= shipSizes.length) {
@@ -108,7 +108,7 @@ object GridController {
   Display the grid with labels. If showShip : It's the current user grid. Else it's the opponent grid.
    */
   @tailrec
-  def displayGrid (grid: Grid, player: Player, opponent: Player, showShip: Boolean, x: Int, y: Int): Unit = {
+  def displayGrid (grid: Grid, player: Player, opponent: Player, showShip: Int, x: Int, y: Int): Unit = {
     var newX: Int = x
     var newY: Int = y
     if (!(x == -1 && y == grid.cols)) {
@@ -116,10 +116,14 @@ object GridController {
         /* We are on the first row labels */
         case -1 =>
           if (x == -1) {
-            if (showShip) {
+            if (showShip == 0) {
+              // We display Player ship
               displayToUser(Some(player), Some(opponent), "ship grid", 2, false)
-            } else {
+            } else if (showShip == 1) {
               displayToUser(Some(player), Some(opponent), "please shoot on a new slot of " + opponent.getColor() + opponent.getName() + YELLOW +  "'s grid.", 2, false)
+            } else if (showShip == 2 || showShip == 3) {
+              // We display Opponent ship
+              displayToUser(Some(opponent), Some(player), "ship grid", 2, false)
             }
             print(YELLOW + "\\ " + RESET)
             newX += 1
@@ -144,7 +148,7 @@ object GridController {
             if (grid.grid(y)(x).isShipHere) {
               if (grid.grid(y)(x).isShooted) print(YELLOW + RED_B + "X " + RESET)
               else {
-                if (showShip) print(GREEN + "X " + RESET)
+                if (showShip == 0 || showShip == 2) print(GREEN + "X " + RESET)
                 else print(". ")
               }
             }
@@ -170,7 +174,10 @@ object GridController {
   Return : Updated grid with the shoot of the user.
    */
   def shootOnGrid (grid: Grid, player: Player, opponent: Player): Grid = {
-    if (!player.getIsAI()) displayGrid(grid, player, opponent, false, -1, -1)
+    if (!player.getIsAI()) {
+      displayGrid(grid, player, opponent, 0, -1, -1)
+      displayGrid(grid, player, opponent, 1, -1, -1)
+    }
     displayToUser(Some(player), None, "where do you want to shoot ?", 2, false)
     val xy: Array[Int] = player.play()
 
@@ -185,8 +192,9 @@ object GridController {
       var newG: Array[Array[Element]] = grid.grid.clone()
       newG(y)(x) = newElement
       val newGrid: Grid = grid.copy(grid = newG, ships = newShips)
-      if (!player.getIsAI() || !opponent.getIsAI()) displayGrid(newGrid, player, opponent, true, -1, -1)
-      else if (!player.getIsAI() && !opponent.getIsAI()) displayGrid(newGrid, player, opponent, false, -1, -1)
+      if (!player.getIsAI() && opponent.getIsAI()) displayGrid(newGrid, player, opponent, 3, -1, -1)
+      else if (player.getIsAI() && !opponent.getIsAI()) displayGrid(newGrid, player, opponent, 2, -1, -1)
+      else if (!player.getIsAI() && !opponent.getIsAI()) displayGrid(newGrid, player, opponent, 3, -1, -1)
 
       /* We display the result */
       if (grid.grid(y)(x).isShipHere) {

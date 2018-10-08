@@ -1,12 +1,12 @@
+// import au.com.bytecode.opencsv.CSVWriter
+import java.io.{BufferedWriter, FileWriter}
 import scala.util.Random
 import Console.{BLUE, GREEN, MAGENTA, RED, RESET, UNDERLINED, YELLOW}
 import scala.annotation.tailrec
-import java.io.{BufferedWriter, FileWriter}
 import scala.collection.JavaConversions._
 import scala.collection.mutable.ListBuffer
 import scala.util.Random
-// import au.com.bytecode.opencsv.CSVWriter
-
+import au.com.bytecode.opencsv.CSVWriter
 
 // case class Ship (size: Int, start: Array[String], direction: String, hit: Int)
 
@@ -103,9 +103,9 @@ object Game extends App {
         if (g1.ships.isEmpty) {
 
           if (loop <= nbResultDisplayed) {
-            GridController.displayGrid(g1, p1, p2, true, -1, -1)
+            GridController.displayGrid(g1, p1, p2, 0, -1, -1)
 
-            GridController.displayGrid(g2, p2, p1, true, -1, -1)
+            GridController.displayGrid(g2, p2, p1, 0, -1, -1)
           }
 
           println(p2.getColor() + p2.getName() + GREEN + " has destroy all ships. He's the winner, " + RED + "congratulations.\n" + RESET)
@@ -129,8 +129,8 @@ object Game extends App {
         if (g2.ships.isEmpty) {
 
           if (loop <= nbResultDisplayed) {
-            GridController.displayGrid(g2, p2, p1, true, -1, -1)
-            GridController.displayGrid(g1, p1, p2, true, -1, -1)
+            GridController.displayGrid(g2, p2, p1, 0, -1, -1)
+            GridController.displayGrid(g1, p1, p2, 0, -1, -1)
           }
           println(p1.getColor() + p1.getName() + GREEN + " has destroy all ships. He's the winner, " + RED + "congratulations.\n" + RESET)
           println(RED + "========== GAME END ==========\n" + RESET)
@@ -166,6 +166,8 @@ object Game extends App {
         }
         else if (isTestAI == 1 && loop == 1) {
           println(YELLOW + "\nBattleship is finished. You will find game results in a CSV file.\n" + RESET)
+
+          exportCSV(history)
 
           print(GREEN + history(0).p1 + " - " + history(0).p1V + " V. || " + RESET)
           println(GREEN + history(0).p2 + " - " + history(0).p2V + " V." + RESET)
@@ -350,9 +352,23 @@ object Game extends App {
     }
   }
 
-  def exportCSV (h: History): Boolean = {
-    val outputFile = new BufferedWriter(new FileWriter("output.csv"))
+  def exportCSV (h: Array[History]): Boolean = {
+    val outputFile = new BufferedWriter(new FileWriter("ai_proof.csv"))
     val csvWriter = new CSVWriter(outputFile)
+    val csvFields: Array[String] = Array("AI Name", "score", "AI Name2", "score2")
+    val row1: Array[String] = Array("AI Level Beginner", h(0).p1V.toString(), "Level Medium", h(0).p2V.toString())
+    val row2: Array[String] = Array("AI Level Beginner", h(1).p1V.toString(), "Level Hard", h(1).p2V.toString())
+    val row3: Array[String] = Array("AI Medium", h(1).p1V.toString(), "Level Hard", h(2).p2V.toString())
+
+    var listOfRecords = new ListBuffer[Array[String]]()
+    listOfRecords += csvFields
+    listOfRecords += row1
+    listOfRecords += row2
+    listOfRecords += row3
+
+    csvWriter.writeAll(listOfRecords.toList)
+    outputFile.close()
+
     true
   }
 }
