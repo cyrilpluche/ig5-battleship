@@ -1,10 +1,16 @@
 import scala.util.Random
 import Console.{BLUE, GREEN, MAGENTA, RED, RESET, UNDERLINED, YELLOW}
 import scala.annotation.tailrec
+import java.io.{BufferedWriter, FileWriter}
+import scala.collection.JavaConversions._
+import scala.collection.mutable.ListBuffer
+import scala.util.Random
+// import au.com.bytecode.opencsv.CSVWriter
+
 
 // case class Ship (size: Int, start: Array[String], direction: String, hit: Int)
 
-case class History (p1: String, p1V: Int, p2: String, p2V: Int, p3: String, p3V: Int)
+case class History (p1: String, p1V: Int, p2: String, p2V: Int)
 
 object Game extends App {
 
@@ -20,13 +26,13 @@ object Game extends App {
   val grid2: Grid = Grid(rows, cols, Array.ofDim[Element](rows, cols), Nil)
 
 
-  val game = mainLoop(0, null, null, grid1, grid2, 1, History("p1", 0, "p2", 0, "p3", 0), 0)
+  val game = mainLoop(0, null, null, grid1, grid2, 1, Array(History("AI1", 0, "AI2", 0), History("AI1", 0, "AI3", 0), History("AI2", 0, "AI3", 0)), 0)
 
   /*
   This loop is a recursive match case pattern. Each case correspond to an action of the game.
    */
   @tailrec
-  def mainLoop (i: Int, p1: Player, p2: Player, g1: Grid, g2: Grid, loop: Int, history: History, isTestAI: Int): Boolean = {
+  def mainLoop (i: Int, p1: Player, p2: Player, g1: Grid, g2: Grid, loop: Int, history: Array[History], isTestAI: Int): Boolean = {
     i match {
       case 0 =>
         /* Start display and player 1 informations */
@@ -45,19 +51,6 @@ object Game extends App {
             val players: Array[Player] = selectTest(3)
             mainLoop(2, players(0), players(1), g1, g2, 100, history, 3)
           }
-        /*}*/ /* else {
-          if (isTestAI - 1 == 0 && loop == 1) {
-            /* We have execute all games */
-            mainLoop(10, p1, p2, g1, g2, 1, history, 0)
-
-          } else {
-            /* We continue to execute games of one versus */
-            println("LOOP : " + loop)
-            val newLoop = loop - 1
-            mainLoop(2, p1, p2, g1, g2, newLoop, history, isTestAI)
-          }
-        }*/
-
 
       case 1 =>
         /* Player 2 informations */
@@ -119,10 +112,10 @@ object Game extends App {
           println(RED + "========== GAME END ==========\n" + RESET)
 
           if (isTestAI == 0) {
-            val newHistory: History = history.copy(p1.getName(), history.p1V, p2.getName(), history.p2V + 1)
-            mainLoop(10, p1, p2, g1, g2, loop, newHistory, isTestAI)
+            val newHistory: History = history(0).copy(p1.getName(), history(0).p1V, p2.getName(), history(0).p2V + 1)
+            mainLoop(10, p1, p2, g1, g2, loop, Array(newHistory), isTestAI)
           } else {
-            val newHistory = updateAIHistory(p2.getName(), history)
+            val newHistory = updateAIHistory(p2.getName(), history, isTestAI)
             mainLoop(10, p1, p2, g1, g2, loop, newHistory, isTestAI)
           }
 
@@ -143,10 +136,10 @@ object Game extends App {
           println(RED + "========== GAME END ==========\n" + RESET)
 
           if (isTestAI == 0) {
-            val newHistory: History = history.copy(p1.getName(), history.p1V + 1, p2.getName(), history.p2V)
-            mainLoop(10, p1, p2, g1, g2, loop, newHistory, isTestAI)
+            val newHistory: History = history(0).copy(p1.getName(), history(0).p1V + 1, p2.getName(), history(0).p2V)
+            mainLoop(10, p1, p2, g1, g2, loop, Array(newHistory), isTestAI)
           } else {
-            val newHistory = updateAIHistory(p1.getName(), history)
+            val newHistory = updateAIHistory(p1.getName(), history, isTestAI)
             mainLoop(10, p1, p2, g1, g2, loop, newHistory, isTestAI)
           }
 
@@ -160,9 +153,6 @@ object Game extends App {
         p1.targetLocked = false
         p2.isShipTouched = 0
         p2.targetLocked = false
-        println(loop)
-        println(isTestAI)
-
 
         if (isTestAI > 1) {
           if (loop == 1) {
@@ -177,10 +167,14 @@ object Game extends App {
         else if (isTestAI == 1 && loop == 1) {
           println(YELLOW + "\nBattleship is finished. You will find game results in a CSV file.\n" + RESET)
 
-          println(GREEN + history.p1 + " - " + history.p1V + " V." + RESET)
-          println(GREEN + history.p2 + " - " + history.p2V + " V." + RESET)
-          println(GREEN + history.p3 + " - " + history.p3V + " V.\n" + RESET)
+          print(GREEN + history(0).p1 + " - " + history(0).p1V + " V. || " + RESET)
+          println(GREEN + history(0).p2 + " - " + history(0).p2V + " V." + RESET)
 
+          print(GREEN + history(1).p1 + " - " + history(1).p1V + " V. || " + RESET)
+          println(GREEN + history(1).p2 + " - " + history(1).p2V + " V." + RESET)
+
+          print(GREEN + history(2).p1 + " - " + history(2).p1V + " V. || " + RESET)
+          println(GREEN + history(2).p2 + " - " + history(2).p2V + " V." + RESET)
 
           mainLoop(11, p1, p2, g1, g2, loop, history, isTestAI)
         }
@@ -190,17 +184,17 @@ object Game extends App {
         }
         else if (loop == 1) {
           /* End of casual loop */
-          println(GREEN + history.p1 + " - " + history.p1V + " V." + RESET)
-          println(GREEN + history.p2 + " - " + history.p2V + " V.\n" + RESET)
-          println(YELLOW + "Do you want to play more ? (Y/N) > " + RESET)
+          println(GREEN + history(0).p1 + " - " + history(0).p1V + " V." + RESET)
+          println(GREEN + history(0).p2 + " - " + history(0).p2V + " V.\n" + RESET)
+          print(YELLOW + "Do you want to play more ? (Y/N) > " + RESET)
           val a: String = scala.io.StdIn.readLine()
           println(a)
 
           if (a == "Y") {
             println(YELLOW + "\nGame is restarting.\n" + RESET)
-            val newHistory: History = history.copy(p2.getName(), history.p2V, p1.getName(), history.p1V)
+            val newHistory: History = history(0).copy(p2.getName(), history(0).p2V, p1.getName(), history(0).p1V)
             val newLoop: Int = setNumberLoops()
-            mainLoop(2, p2, p1, grid1, grid2, newLoop, newHistory, isTestAI)
+            mainLoop(2, p2, p1, grid1, grid2, newLoop, Array(newHistory), isTestAI)
           } else if (a == "N") {
             println(YELLOW + "\nBattleship is finished. You will find game results in a CSV file.\n" + RESET)
             mainLoop(11, p1, p2, g1, g2, loop, history, isTestAI)
@@ -212,9 +206,9 @@ object Game extends App {
         }
         else {
           /* New loop for casual games */
-          val newHistory: History = history.copy(p2.getName(), history.p2V, p1.getName(), history.p1V)
+          val newHistory: History = history(0).copy(p2.getName(), history(0).p2V, p1.getName(), history(0).p1V)
           println(RED + "========== GAME START ========== \n" + RESET)
-          mainLoop(2, p2, p1, grid1, grid2, loop - 1, newHistory, isTestAI)
+          mainLoop(2, p2, p1, grid1, grid2, loop - 1, Array(newHistory), isTestAI)
         }
 
       case 11 =>
@@ -296,8 +290,8 @@ object Game extends App {
     val newLoop = scala.io.StdIn.readLine()
     try {
       val newLoopToInt = newLoop.toInt
-      if (newLoopToInt < 0) {
-        println(RED + "\nERROR : " + newLoopToInt +" => Negative number." + RESET)
+      if (newLoopToInt < 1) {
+        println(RED + "\nERROR : " + newLoopToInt +" => Invalid number." + RESET)
         setNumberLoops()
       }
       else {
@@ -312,17 +306,53 @@ object Game extends App {
     }
   }
 
-  def updateAIHistory (AIName: String, h: History): History = {
+  def updateAIHistory (AIName: String, h: Array[History], nbTestAI: Int): Array[History] = {
     AIName match {
       case "AI1" =>
-        val newH = h.copy(p1V = h.p1V + 1)
-        newH
+        if (nbTestAI == 3) {
+          // AI1 vs AI2
+          val newH = h(0).copy(p1V = h(0).p1V + 1)
+          val newArrayH = Array(newH, h(1), h(2))
+          newArrayH
+        } else {
+          // AI1 vs AI3
+          val newH = h(1).copy(p1V = h(1).p1V + 1)
+          val newArrayH = Array(h(0), newH, h(2))
+          newArrayH
+        }
+
       case "AI2" =>
-        val newH = h.copy(p2V = h.p2V + 1)
-        newH
+        if (nbTestAI == 3) {
+          // AI1 vs AI2
+          val newH = h(0).copy(p2V = h(0).p2V + 1)
+          val newArrayH = Array(newH, h(1), h(2))
+          newArrayH
+        } else {
+          // AI2 vs AI3
+          val newH = h(2).copy(p1V = h(2).p1V + 1)
+          val newArrayH = Array(h(0), h(1), newH)
+          newArrayH
+        }
+
       case "AI3" =>
-        val newH = h.copy(p3V = h.p3V + 1)
-        newH
+        if (nbTestAI == 2) {
+          // AI1 vs AI3
+          val newH = h(1).copy(p2V = h(1).p2V + 1)
+          val newArrayH = Array(h(0), newH, h(2))
+          newArrayH
+        } else {
+          // AI2 vs AI3
+          val newH = h(2).copy(p2V = h(2).p2V + 1)
+          val newArrayH = Array(h(0), h(1), newH)
+          newArrayH
+        }
+
     }
+  }
+
+  def exportCSV (h: History): Boolean = {
+    val outputFile = new BufferedWriter(new FileWriter("output.csv"))
+    val csvWriter = new CSVWriter(outputFile)
+    true
   }
 }
