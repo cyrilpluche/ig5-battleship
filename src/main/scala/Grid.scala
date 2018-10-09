@@ -217,6 +217,7 @@ object GridController {
   /*
   Return : Ship list updated according to the xy shoot. 1 ship will be updated.
    */
+  @tailrec
   def shootShip (player: Player, ships: List[Ship], updatedShips: List[Ship], x: Int, y: Int, i: Int): List[Ship] = {
     if (i >= ships.size) updatedShips
     else {
@@ -246,6 +247,7 @@ object GridController {
   /*
   We remove every ships that are dead.
    */
+  @tailrec
   def removeEmptyShips (grid: Grid, player: Player, opponent: Player, updatedShips: List[Ship], i: Int): Grid = {
     if (grid.ships.size == i) {
       val newGrid: Grid = grid.copy(ships = updatedShips)

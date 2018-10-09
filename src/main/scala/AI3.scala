@@ -8,8 +8,8 @@ class AI3(override val random: Random, override val name: String, override val c
     isShipTouched match {
       case 0 =>
         /* We are searching for random shot */
-        val x = random.nextInt(cols)
-        val y = random.nextInt(rows)
+        val x = random.nextInt(10)
+        val y = random.nextInt(10)
         orientationChosen = orientations(0)
         nbOrientationTried = 0
         lastShot = Array(y, x)

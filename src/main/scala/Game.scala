@@ -198,7 +198,7 @@ object Game extends App {
             val newLoop: Int = setNumberLoops()
             mainLoop(2, p2, p1, grid1, grid2, newLoop, Array(newHistory), isTestAI)
           } else if (a == "N") {
-            println(YELLOW + "\nBattleship is finished. You will find game results in a CSV file.\n" + RESET)
+            println(YELLOW + "\nBattleship is finished.\n" + RESET)
             mainLoop(11, p1, p2, g1, g2, loop, history, isTestAI)
 
           } else {
@@ -224,7 +224,6 @@ object Game extends App {
     println("1 - " + YELLOW + "AI level 1." + RESET)
     println("2 - " + YELLOW + "AI level 2." + RESET)
     println("3 - " + YELLOW + "AI level 3." + RESET)
-    println("4 - " + YELLOW + "AI test." + RESET)
 
     print(BLUE + "Planner" + GREEN + " : Submit player type > " + RESET)
     val playerType = scala.io.StdIn.readLine()
@@ -241,8 +240,6 @@ object Game extends App {
       case "2" =>
         new AI2(random2, "AI2", num - 1, true, 2)
       case "3" =>
-        new AI3(random3, "AI3", num - 1, true, 3)
-      case "4" =>
         new AI3(random3, "AI3", num - 1, true, 3)
       case _ =>
         println(RED + "Please, submit a valid type (0, 1, 2 or 3).\n")

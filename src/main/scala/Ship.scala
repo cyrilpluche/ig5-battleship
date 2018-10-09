@@ -1,4 +1,6 @@
-import Helper.{displayToUser}
+import Helper.displayToUser
+
+import scala.annotation.tailrec
 
 case class Ship (elements: List[Element], orientation: String, size: Int, isDead: Boolean)
 
@@ -23,6 +25,7 @@ object ShipController {
     }
   }
 
+  @tailrec
   def isTouched (player: Player, ship: Ship, updatedElement: List[Element], x: Int, y: Int, i: Int): Ship = {
     if (i >= ship.elements.length) {
       if (updatedElement.isEmpty) {

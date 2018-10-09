@@ -7,8 +7,8 @@ case class AI1(random: Random, name: String, color: Int, isIA: Boolean, lvlAI: I
   val orientationLabels: Array[String] = Array("right", "left", "top", "bottom")
 
   def play (): Array[Int] = {
-    val x = random.nextInt(cols)
-    val y = random.nextInt(rows)
+    val x = random.nextInt(10)
+    val y = random.nextInt(10)
     Array(y, x)
   }
 
