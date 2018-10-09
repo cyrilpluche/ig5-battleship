@@ -20,7 +20,7 @@ object Game extends App {
   val random1: Random = new Random
   val random2: Random = new Random
   val random3: Random = new Random
-  val nbResultDisplayed = 1
+  val nbResultDisplayed = 5
 
   val grid1: Grid = Grid(rows, cols, Array.ofDim[Element](rows, cols), Nil)
   val grid2: Grid = Grid(rows, cols, Array.ofDim[Element](rows, cols), Nil)
@@ -218,6 +218,9 @@ object Game extends App {
     }
   }
 
+  /*
+  Select the kind of player link the to num (0 or 1)
+   */
   def selectGameMode (num: Int): Player = {
     println(YELLOW + "Select player type n°" + num + "." + RESET)
     println("0 - " + YELLOW + "Human." + RESET)
@@ -248,6 +251,9 @@ object Game extends App {
 
   }
 
+  /*
+  Select the kind of game. Can be an AI tests (100 games between each AI) or a casual game where you will choose 2 kinds of players.
+   */
   def activeTest (): Boolean = {
     println(YELLOW + "Do you want to execute the AI tests ? (Y/N) > " + RESET)
     val a: String = scala.io.StdIn.readLine()
@@ -263,6 +269,9 @@ object Game extends App {
     }
   }
 
+  /*
+  Select which AI should play for the AI test
+   */
   def selectTest (indiceTest: Int): Array[Player] = {
     indiceTest match {
       case 3 =>
@@ -284,6 +293,9 @@ object Game extends App {
     }
   }
 
+  /*
+  Set how many games will be played between two players (usefull for AI)
+   */
   def setNumberLoops (): Int = {
     print(BLUE + "Planner" + GREEN + " : How many games do you want to execute ? > " + RESET)
     val newLoop = scala.io.StdIn.readLine()
@@ -305,6 +317,9 @@ object Game extends App {
     }
   }
 
+  /*
+  Save result of AI tests games
+   */
   def updateAIHistory (AIName: String, h: Array[History], nbTestAI: Int): Array[History] = {
     AIName match {
       case "AI1" =>
@@ -349,6 +364,9 @@ object Game extends App {
     }
   }
 
+  /*
+  Export AI test games results inside a csv a the main root of the project
+   */
   def exportCSV (h: Array[History]): Boolean = {
     val outputFile = new BufferedWriter(new FileWriter("ai_proof.csv"))
     val csvWriter = new CSVWriter(outputFile)

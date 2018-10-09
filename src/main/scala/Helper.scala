@@ -2,6 +2,9 @@ import Console.{BLUE, GREEN, MAGENTA, RED, RESET, UNDERLINED, YELLOW}
 
 object Helper {
 
+  /*
+  Display message to the user's console
+   */
   def displayToUser (player: Option[Player], opponent: Option[Player], msg: String, style: Int, space: Boolean) = {
     if (!player.get.getIsAI()) {
       style match {

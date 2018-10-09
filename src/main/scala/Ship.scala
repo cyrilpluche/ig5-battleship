@@ -6,6 +6,10 @@ case class Ship (elements: List[Element], orientation: String, size: Int, isDead
 
 object ShipController {
 
+  /*
+  Generate all elements based on the slot and size of the ship given.
+   */
+  @tailrec
   def generateElements (ship: Ship, slot: Array[Int], i: Int): Ship = {
     if (i > ship.size - 1) ship
     else {
@@ -25,6 +29,9 @@ object ShipController {
     }
   }
 
+  /*
+  Generate the new elements list of a ship without the touched element
+   */
   @tailrec
   def isTouched (player: Player, ship: Ship, updatedElement: List[Element], x: Int, y: Int, i: Int): Ship = {
     if (i >= ship.elements.length) {
@@ -41,6 +48,9 @@ object ShipController {
     }
   }
 
+  /*
+  Display a message if a ship is killed
+   */
   def killShipMessage (player: Player, opponent: Player, s: Int): Unit = {
     displayToUser(Some(player), Some(opponent), "has destroy a ship of size" + s + ". The other player said " + Console.RED + "\'You sank my battleship!\'.", 3, true)
   }
